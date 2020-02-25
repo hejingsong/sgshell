@@ -1,0 +1,194 @@
+body {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin: 0px;
+    overflow: hidden;
+}
+
+#nav {
+    height: 30px;
+    line-height: 30px;
+}
+
+#term-box {
+    height: calc(100% - 25px);
+}
+
+#term-box .term-container {
+    z-index: 1;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 25px);
+    background-color: rgba(0, 0, 0, 1);
+}
+
+.mask {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: rgba(55, 55, 55, 0.7);
+}
+
+.link-box,
+.message-box {
+    position: absolute;
+    width: 45%;
+    --width1: 45%;
+    left: calc((100% - var(--width1)) / 2);
+    top: 100px;
+}
+
+.link-header,
+.message-header {
+    height: 33px;
+    line-height: 33px;
+    background-color: rgba(33, 33, 33, 0.7);
+    border-radius: 5px 5px 0px 0px;
+    user-select: none;
+    padding: 0px 5px;
+}
+
+.close-btn {
+    width: 15px;
+    height: 15px;
+    float: right;
+    margin-top: 8px;
+}
+
+.close-btn:hover {
+    background-color: red;
+    border-radius: 50px;
+}
+
+.link-header span,
+.link-body span,
+.message-header span,
+.message-body span {
+    color: white;
+}
+
+.link-body,
+.message-body {
+    background-color: rgba(55, 55, 55, 0.7);
+    border-radius: 0px 0px 5px 5px;
+    padding: 5px;
+}
+
+input[type=text],
+input[type=password] {
+    border: none;
+    border-radius: 2px;
+    height: 22px;
+    padding: 2px 5px;
+    margin: 2px 5px;
+}
+
+.link-body span {
+    display: inline-block;
+    width: 50px;
+}
+
+.input-line {
+    height: 32px;
+    line-height: 32px;
+    color: white;
+}
+
+.key-btn {
+    height: 26px;
+    width: 25px;
+    margin-right: 10px;
+    background: #555;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 2px 5px
+}
+
+.key-btn:hover {
+    background: #222;
+    box-shadow: 0px 0px 2px #000 inset;
+}
+
+.bottom-line, .message-bottom {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.bottom-line button, .message-bottom button {
+    margin-right: 10px;
+    height: 32px;
+    width: 50px;
+    background: transparent;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+
+.bottom-line button:hover, .message-bottom button  {
+    background: #222;
+    box-shadow: 0px 0px 2px #000 inset;
+}
+
+.message-icon {
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    margin-right: 10px;
+}
+
+.message-body span {
+    position: absolute;
+    margin-top: 5px;
+}
+
+.nav-item {
+    display: inline-block;
+    padding: 0px 5px;
+    background-color: rgb(51, 161, 231);
+    color: white;
+    font-size: 14px;
+    margin-right: 1px;
+    cursor: default;
+    user-select: none;
+}
+
+.nav-item-active {
+    box-shadow: 0px 0px 5px black;
+}
+
+.nav-state {
+    height: 15px;
+    width: 15px;
+    float: left;
+    margin-top: 7px;
+    margin-right: 6px;
+}
+
+.nav-close {
+    height: 15px;
+    width: 15px;
+    float: right;
+    margin-top: 7px;
+    margin-left: 6px;
+}
+
+.nav-close:hover {
+    background-color: rgb(235, 57, 65);
+    border-radius: 50px;
+}
+
+.connect-message {
+    color: white;
+    text-align: center;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    margin-top: 30%;
+}

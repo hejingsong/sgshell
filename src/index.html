@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>sgshell</title>
+  <link rel="stylesheet" type="text/css" href="./css/global.css" />
+  <link rel="stylesheet" type="text/css" href="./css/xterm.css" />
+</head>
+<body>
+  <div id="nav"></div>
+  <div id="term-box"></div>
+  <div class="mask" style="display: none;">
+    <div class="link-box">
+      <div class="link-header">
+        <span>快速连接</span>
+        <img class="close-btn" src="./img/close.png">
+      </div>
+      <div class="link-body">
+        <div class="input-line">
+          <span>主机</span>
+          <input class="link-host" type="text" style="width: 250px" placeholder="主机">
+          <span style="width: 35px;">端口</span>
+          <input class="link-port" type="text" style="width: 50px;" placeholder="端口">
+        </div>
+        <div class="input-line">
+          <span>用户名</span>
+          <input class="link-user" type="text" placeholder="用户名">
+        </div>
+        <div class="input-line">
+          <span>方法</span>
+          <input type="radio" name="link-loginType" value="1">密码</input>
+          <input type="radio" name="link-loginType" value="2">密钥</input>
+        </div>
+        <div class="input-line key-input-line">
+          <span>密钥</span>
+          <input class="link-key" type="text" placeholder="密钥">
+          <input class="link-key-file" type="file" style="display: none;">
+          <button class="link-select-key" class="key-btn">...</button>
+        </div>
+        <div class="input-line pass-input-line">
+          <span>密码</span>
+          <input class="link-passwd" type="password" placeholder="密码">
+        </div>
+        <div class="bottom-line">
+          <button class="link-confirm">确认</button>
+          <button class="link-cancel">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mask" style="display: none;">
+    <div class="message-box">
+      <div class="message-header">
+        <span></span>
+        <img class="close-btn" src="./img/close.png">
+      </div>
+      <div class="message-body">
+        <img class="message-icon" src="./img/false.png">
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <div class="mask" style="display: none;">
+    <div class="message-box">
+      <div class="message-header">
+        <span></span>
+        <img class="close-btn" src="./img/close.png">
+      </div>
+      <div class="message-body">
+        <img class="message-icon" src="./img/false.png">
+        <span></span>
+        <div class="message-bottom">
+          <button class="message-confirm">确认</button>
+          <button class="message-cancel">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mask" style="display: none; z-index: 5000;">
+    <span class="connect-message">正在连接服务器...</span>
+  </div>
+</body>
+</html>

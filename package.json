@@ -1,0 +1,48 @@
+{
+  "name": "sgshell",
+  "version": "1.0.0",
+  "description": "A simple ssh client tool",
+  "main": "index.html",
+  "window": {
+    "toolbar": true,
+    "width": 1024,
+    "height": 768,
+    "icon": "img/smile.png",
+    "position": "center",
+    "resizable": true,
+    "show_in_taskbar": true,
+    "frame": true
+  },
+  "scripts": {
+    "build": "webpack --config ./webpack",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "build-dev": "cross-env NODE_ENV=development npm run build",
+    "dev": "nw ./dist"
+  },
+  "keywords": [
+    "nwjs",
+    "ssh client"
+  ],
+  "author": "hejingsong <240197153@qq.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^10.15.3",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "cross-env": "^6.0.3",
+    "css-loader": "^3.4.0",
+    "html-webpack-plugin": "^3.2.0",
+    "node-loader": "^0.6.0",
+    "style-loader": "^1.1.2",
+    "ts-loader": "^6.2.1",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.4",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.2.2",
+    "xterm": "^4.3.0",
+    "xterm-addon-fit": "^0.3.0"
+  },
+  "dependencies": {}
+}
