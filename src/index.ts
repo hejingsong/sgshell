@@ -12,18 +12,12 @@ import {
 } from "./preload";
 import { confirmWarning, error } from "./util/helper";
 
-declare var nw: any;
-
-const gui = require("nw.gui");
+const framework = require("./classes/framework");
 const path = require("path");
-const shell = gui.Shell;
-const nwWin = nw.Window.get();
-const clipboard = gui.Clipboard.get();
 const baseDir = path.dirname(process.execPath);
 const backendName = "/backend/webSocketServer.exe";
 const sgProto = new SgProto("./proto/sgshell.proto");
 let connector: Connector = null;
-let contextMenu: any;
 
 function closeCurrentDialog() {
     if (!connector.isReady()) {
@@ -43,8 +37,6 @@ function closeCurrentDialog() {
             continue;
         }
         const zIndex = parseInt(mask.style.zIndex, 10);
-        console.log(mask.style.zIndex);
-        console.log(zIndex);
         if (zIndex > maxZIndex) {
             maxZIndex = zIndex;
             matchMask = mask;
@@ -65,7 +57,7 @@ function copyText() {
     if (!selectedText) {
         return;
     }
-    clipboard.set(selectedText, "text");
+    framework.setClipboard(selectedText);
 }
 
 function pasteText() {
@@ -73,111 +65,11 @@ function pasteText() {
     if (!term) {
         return;
     }
-    const text = clipboard.get("text");
+    const text = framework.getClipboard();
     if (!text) {
         return;
     }
     term.pasteText(text);
-}
-
-function initContextMenu() {
-    contextMenu = new nw.Menu({ type: "contextmenu" });
-    contextMenu.append(new nw.MenuItem({
-        label: "复制",
-        click: () => {
-            copyText();
-        }
-    }));
-    contextMenu.append(new nw.MenuItem({
-        label: "黏贴",
-        click: () => {
-            pasteText();
-        }
-    }));
-}
-
-function initMenu() {
-    const menuBar = new nw.Menu({ type: "menubar" });
-    const fileMenu = new nw.Menu();
-
-    fileMenu.append(new nw.MenuItem({
-        label: "新建",
-        key: "N",
-        modifiers: "alt",
-        click: () => {
-            eventMgr.emit("file/new");
-        },
-    }));
-    fileMenu.append(new nw.MenuItem({
-        label: "打开",
-        key: "O",
-        modifiers: "alt",
-        click: () => {
-            eventMgr.emit("file/open");
-        },
-    }));
-    fileMenu.append(new nw.MenuItem({
-        type: "separator"
-    }));
-    fileMenu.append(new nw.MenuItem({
-        label: "断开",
-        key: "C",
-        modifiers: "alt",
-        click: () => {
-            eventMgr.emit("file/close");
-        },
-    }));
-    fileMenu.append(new nw.MenuItem({
-        type: "separator"
-    }));
-    fileMenu.append(new nw.MenuItem({
-        label: "退出",
-        click: () => {
-            nwWin.close();
-        },
-    }));
-
-    menuBar.append(new nw.MenuItem({
-        label: "文件",
-        submenu: fileMenu,
-    }));
-
-    nw.Window.get().menu = menuBar;
-}
-
-function initShortCut() {
-    const newLnkOpt = {
-        key: "Alt+N",
-        active: () => {
-            eventMgr.emit("file/new");
-        }
-    };
-    const openOpt = {
-        key: "Alt+O",
-        active: () => {
-            eventMgr.emit("file/open");
-        }
-    };
-    const closeOpt = {
-        key: "Alt+C",
-        active: () => {
-            eventMgr.emit("file/close");
-        }
-    };
-    const escOpt = {
-        key: "Escape",
-        active: () => {
-            closeCurrentDialog();
-        }
-    };
-    const newLnkSc = new nw.Shortcut(newLnkOpt);
-    const openSc = new nw.Shortcut(openOpt);
-    const closeSc = new nw.Shortcut(closeOpt);
-    const escSc = new nw.Shortcut(escOpt);
-    nw.App.registerGlobalHotKey(newLnkSc);
-    nw.App.registerGlobalHotKey(openSc);
-    nw.App.registerGlobalHotKey(closeSc);
-    nw.App.registerGlobalHotKey(escSc);
 }
 
 function initNet() {
@@ -264,9 +156,9 @@ function closeCurrentTerminal() {
 }
 
 initNet();
-initMenu();
-initContextMenu();
-initShortCut();
+framework.initMenu();
+framework.initContextMenu();
+framework.initShortCut();
 
 terminalMgr.setOnData((term: CTerminal, msg: string) => {
     const termId = term.getTermId();
@@ -329,6 +221,15 @@ eventMgr.add("resize", () => {
     const data = sgProto.encode("resize", { row, col });
     connector.send(data);
 });
+eventMgr.add("contextmenu/copy", () => {
+    copyText();
+});
+eventMgr.add("contextmenu/paste", () => {
+    pasteText();
+});
+eventMgr.add("app/esc", () => {
+    closeCurrentDialog();
+});
 eventMgr.add(PROTOCOL.loginResponse, (data: any) => {
     if (data.code === -1) {
         error("连接错误", data.msg);
@@ -362,12 +263,12 @@ document.body.addEventListener("contextmenu", (ev) => {
 
 termContainer.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
-    contextMenu.popup(ev.x, ev.y);
+    framework.showContextMenu(ev.x, ev.y);
     return false;
 });
 
 if (process.env.NODE_ENV === "development") {
-    nwWin.showDevTools();
+    framework.showDevTool();
 } else {
-    shell.openItem(baseDir + backendName);
+    framework.exec(baseDir + backendName);
 }
