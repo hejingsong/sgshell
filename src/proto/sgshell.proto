@@ -29,3 +29,17 @@ resize 5 {
     row: number16;
     col: number16;
 }
+
+userSession 10 {
+    name: string;
+    host: string;
+    port: number16;
+    user: string;
+    passwd: string;
+    type: number8;
+    key: string;
+}
+
+sessions 11 {
+    list: userSession[];
+}

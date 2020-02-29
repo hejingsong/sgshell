@@ -2,6 +2,8 @@
 import "xterm/css/xterm.css";
 import { Event } from "./classes/event";
 import { Model as LinkModel } from "./classes/link/model";
+import { Model as SessionModel } from "./classes/session/model";
+import { Model as ConfigModel } from "./classes/sessionConfig/model";
 import { TerminalManager } from "./classes/terminalManager";
 
 const navBar = document.getElementById("nav");
@@ -17,6 +19,10 @@ export const eventMgr = new Event();
 
 // link model
 export const linkModel = new LinkModel();
+
+export const sessionModel = new SessionModel();
+
+export const configModel = new ConfigModel();
 
 // protocol
 export const PROTOCOL = {

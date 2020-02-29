@@ -4,17 +4,22 @@ import CTerminal from "./classes/terminal/terminal";
 import { TerminalType } from "./classes/terminalManager";
 import { SgProto } from "./lib/sgProto";
 import {
+    configModel,
     eventMgr,
     linkModel,
     PROTOCOL,
+    sessionModel,
     termContainer,
-    terminalMgr,
+    terminalMgr
 } from "./preload";
 import { confirmWarning, error } from "./util/helper";
 
+const fs = require("fs");
 const framework = require("./classes/framework");
 const path = require("path");
 const baseDir = path.dirname(process.execPath);
+const userDir = baseDir + "/user";
+const sessionFile = userDir + "/session";
 const backendName = "/backend/webSocketServer.exe";
 const sgProto = new SgProto("./proto/sgshell.proto");
 let connector: Connector = null;
@@ -72,6 +77,30 @@ function pasteText() {
     term.pasteText(text);
 }
 
+function writeUserData() {
+    const sessions = sessionModel.getSessions();
+    const buffer = sgProto.encode("sessions", { list: sessions });
+    if (!fs.existsSync(userDir)) {
+        fs.mkdirSync(userDir);
+    }
+    fs.writeFileSync(sessionFile, buffer);
+}
+
+function initUserData() {
+    fs.readFile(sessionFile, (err: Error, data: any) => {
+        if (err) {
+            sessionModel.setSessions([]);
+            return;
+        }
+        if (!data) {
+            sessionModel.setSessions([]);
+            return;
+        }
+        const [protoIdx, sessions] = sgProto.decode(data);
+        sessionModel.setSessions(sessions.list);
+    });
+}
+
 function initNet() {
     connector = new Connector(
         "ws://127.0.0.1:12345",
@@ -109,8 +138,17 @@ function logout(termId: number) {
     connector.send(data);
 }
 
-function createTerminal(host: string, port: number, user: string, passwd: string, type: number, key: string) {
-    const term = terminalMgr.createTerminal(TerminalType.XTERM, termContainer, host);
+function createTerminal(
+    host: string,
+    port: number,
+    user: string,
+    passwd: string,
+    type: number,
+    key: string,
+    name: string = ""
+) {
+    name = name ? name : host;
+    const term = terminalMgr.createTerminal(TerminalType.XTERM, termContainer, name);
     const termSize = term.getSize();
     const nav = term.getNav();
     const [row, col] = termSize;
@@ -156,6 +194,7 @@ function closeCurrentTerminal() {
 }
 
 initNet();
+initUserData();
 framework.initMenu();
 framework.initContextMenu();
 framework.initShortCut();
@@ -203,6 +242,30 @@ linkModel.setConfirmCb(() => {
     );
 });
 
+sessionModel.setConfigModel(configModel);
+sessionModel.setConfirmFun((data: any) => {
+    createTerminal(
+        data.host,
+        data.port,
+        data.user,
+        data.passwd,
+        data.type,
+        data.key,
+        data.name
+    );
+});
+sessionModel.setDbClickFun((data: any) => {
+    createTerminal(
+        data.host,
+        data.port,
+        data.user,
+        data.passwd,
+        data.type,
+        data.key,
+        data.name
+    );
+});
+
 eventMgr.add("file/new", () => {
     newLink();
 });
@@ -210,7 +273,7 @@ eventMgr.add("file/close", () => {
     closeCurrentTerminal();
 });
 eventMgr.add("file/open", () => {
-    // open dialog
+    sessionModel.openDialog();
 });
 eventMgr.add("resize", () => {
     const size = terminalMgr.onResize();
@@ -265,6 +328,10 @@ termContainer.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
     framework.showContextMenu(ev.x, ev.y);
     return false;
+});
+
+framework.onWinClose(() => {
+    writeUserData();
 });
 
 if (process.env.NODE_ENV === "development") {

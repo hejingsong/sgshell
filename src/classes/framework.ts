@@ -128,3 +128,10 @@ export function setClipboard(text: string) {
 export function getClipboard() {
     return clipboard.get("text");
 }
+
+export function onWinClose(cb: CallableFunction) {
+    nwWin.on("close", () => {
+        cb();
+        nwWin.close(true);
+    });
+}

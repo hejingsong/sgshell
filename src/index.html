@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" type="text/css" href="./css/global.css" />
   <link rel="stylesheet" type="text/css" href="./css/xterm.css" />
 </head>
+
 <body>
   <div id="nav"></div>
   <div id="term-box"></div>
@@ -81,5 +83,78 @@
   <div class="mask" style="display: none; z-index: 5000;">
     <span class="connect-message">正在连接服务器...</span>
   </div>
+  <div class="mask" style="display: none;">
+    <div class="session-box">
+      <div class="session-header">
+        <span>快速连接</span>
+        <img class="close-btn" src="./img/close.png">
+      </div>
+      <div class="session-body">
+        <div class="session-option">
+          <button class="add">
+            <img src="./img/add.png" alt="添加">
+          </button>
+          <button class="config">
+            <img src="./img/config.png" alt="配置">
+          </button>
+          <button class="del">
+            <img src="./img/close.png" alt="删除">
+          </button>
+        </div>
+        <div class="session-list">
+          <ul>
+          </ul>
+        </div>
+        <div class="session-bottom">
+          <button class="session-confirm">连接</button>
+          <button class="session-cancel">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mask" style="display: none;">
+    <div class="session-config-box">
+      <div class="header">
+        <span></span>
+        <img class="close-btn" src="./img/close.png">
+      </div>
+      <div class="body">
+        <div class="input-line">
+          <span>会话名</span>
+          <input class="session-name" type="text" placeholder="会话名">
+        </div>
+        <div class="input-line">
+          <span>主机</span>
+          <input class="link-host" type="text" style="width: 250px" placeholder="主机">
+          <span style="width: 35px;">端口</span>
+          <input class="link-port" type="text" style="width: 50px;" placeholder="端口">
+        </div>
+        <div class="input-line">
+          <span>用户名</span>
+          <input class="link-user" type="text" placeholder="用户名">
+        </div>
+        <div class="input-line">
+          <span>方法</span>
+          <input class="type-passwd" type="radio" name="link-loginType" value="1">密码</input>
+          <input class="type-key" type="radio" name="link-loginType" value="2">密钥</input>
+        </div>
+        <div class="input-line key-input-line">
+          <span>密钥</span>
+          <input class="link-key" type="text" placeholder="密钥">
+          <input class="link-key-file" type="file" style="display: none;">
+          <button class="link-select-key" class="key-btn">...</button>
+        </div>
+        <div class="input-line pass-input-line">
+          <span>密码</span>
+          <input class="link-passwd" type="password" placeholder="密码">
+        </div>
+        <div class="bottom-line">
+          <button class="confirm">确认</button>
+          <button class="cancel">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>
