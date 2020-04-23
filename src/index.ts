@@ -24,6 +24,19 @@ const backendName = "/backend/webSocketServer.exe";
 const sgProto = new SgProto("./proto/sgshell.proto");
 let connector: Connector = null;
 
+function isDialogOpening() {
+    const masks = document.getElementsByClassName("mask");
+    const len = masks.length;
+    let mask;
+    for (let i = 0; i < len; ++i) {
+        mask = masks[i] as HTMLElement;
+        if (mask.style.display !== "none") {
+            return true;
+        }
+    }
+    return false;
+}
+
 function closeCurrentDialog() {
     if (!connector.isReady()) {
         return;
@@ -291,7 +304,18 @@ eventMgr.add("contextmenu/paste", () => {
     pasteText();
 });
 eventMgr.add("app/esc", () => {
-    closeCurrentDialog();
+    if (isDialogOpening()) {
+        closeCurrentDialog();
+        return;
+    }
+    const term = terminalMgr.getCurrentTerm();
+    if (!term) {
+        return;
+    }
+    const termId = term.getTermId();
+    const msg = String.fromCharCode(0x1b);
+    const data = sgProto.encode("session", { termId, msg });
+    connector.send(data);
 });
 eventMgr.add(PROTOCOL.loginResponse, (data: any) => {
     if (data.code === -1) {
