@@ -94,7 +94,7 @@ export function initShortCut() {
         }
     };
     const escOpt = {
-        key: "Escape",
+        key: "Alt+Q",
         active: () => {
             eventMgr.emit("app/esc");
         }
