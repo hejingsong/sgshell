@@ -6,11 +6,13 @@ export class SgProto {
     }
 
     public encode(protoName: string, data: any): ArrayBuffer {
-        return sgCore.encode(protoName, data);
+        const code = sgCore.encode(protoName, data);
+        return sgCore.pack(code);
     }
 
     public decode(data: ArrayBuffer): any[] {
-        return sgCore.decode(data);
+        const code = sgCore.unpack(data);
+        return sgCore.decode(code);
     }
 
     public destory() {
