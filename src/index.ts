@@ -167,6 +167,7 @@ function createTerminal(
     const [row, col] = termSize;
     const data = {
         "termId": term.getTermId(),
+        name,
         host,
         port,
         user,
@@ -239,7 +240,8 @@ terminalMgr.setOndblclickCb((data: any) => {
         data.user,
         data.passwd,
         data.type,
-        data.key
+        data.key,
+        data.name
     );
 });
 
