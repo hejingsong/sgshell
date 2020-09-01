@@ -2,7 +2,7 @@ const sgCore = require("./sgProto.node");
 
 export class SgProto {
     public constructor(protoFile: string) {
-        sgCore.parseFromFile(protoFile);
+        sgCore.parseFile(protoFile);
     }
 
     public encode(protoName: string, data: any): ArrayBuffer {
