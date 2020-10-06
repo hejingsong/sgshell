@@ -1,4 +1,4 @@
-import { eventMgr } from "../preload";
+import { eventMgr } from "@/preload";
 
 declare var nw: any;
 

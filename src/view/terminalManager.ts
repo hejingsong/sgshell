@@ -1,7 +1,7 @@
-import { StateIcon, TerminalState } from "./defines";
-import Nav from "./nav";
-import Terminal from "./terminal/terminal";
-import XTerm from "./terminal/xterm/xterm";
+import Nav from "@/view/component/Nav";
+import { StateIcon, TerminalState } from "@/view/defines";
+import Terminal from "@/view/terminal/terminal";
+import XTerm from "@/view/terminal/xterm/xterm";
 
 export enum TerminalType {
     XTERM = 1,
@@ -119,13 +119,13 @@ export class TerminalManager {
     private createNav(title: string, termId: number): Nav {
         const nav = new Nav(title, this.navBar);
         nav.init();
-        nav.setClickCb(() => {
+        nav.on("click", () => {
             this.onNavClick(termId);
         });
-        nav.setCloseCb(() => {
+        nav.on("close", () => {
             this.onClickClose(termId);
         });
-        nav.setOndblclickCb(this.ondblclickCb);
+        nav.on("dbclick", this.ondblclickCb);
         return nav;
     }
 

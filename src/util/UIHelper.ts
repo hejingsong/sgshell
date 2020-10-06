@@ -1,9 +1,6 @@
 export function moveBox(
-    node: HTMLElement,
-    box: HTMLElement,
-    parent: HTMLElement,
-    evt: MouseEvent,
-    yEnable: boolean = true
+    node: HTMLElement, box: HTMLElement,
+    parent: HTMLElement, evt: MouseEvent, yEnable: boolean = true
 ) {
     let isMove = true;
     const x = evt.pageX - box.offsetLeft;
@@ -24,17 +21,3 @@ export function moveBox(
         node.onmouseup = null;
     };
 }
-
-export enum TerminalState {
-    LOADING = 1,
-    SUCCESS,
-    TIP,
-    FAILURE
-}
-
-export const StateIcon = {
-    [TerminalState.LOADING]: "./img/load.png",
-    [TerminalState.SUCCESS]: "./img/true.png",
-    [TerminalState.TIP]: "./img/warning.png",
-    [TerminalState.FAILURE]: "./img/false.png"
-};

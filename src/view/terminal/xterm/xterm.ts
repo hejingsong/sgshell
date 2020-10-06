@@ -1,7 +1,7 @@
+import Nav from "@/view/component/Nav";
+import CTerminal from "@/view/terminal/terminal";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
-import Nav from "../../nav";
-import CTerminal from "../terminal";
 
 class XTerm extends CTerminal {
     private fit: FitAddon;

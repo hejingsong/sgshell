@@ -1,3 +1,5 @@
+import Event from "@/util/event";
+
 export default class Nav {
     private title: string;
     private navElem: HTMLElement;
@@ -5,21 +7,17 @@ export default class Nav {
     private titleElem: HTMLElement;
     private stateElem: HTMLImageElement;
     private closeElem: HTMLImageElement;
-    private clickCb: CallableFunction;
-    private closeCb: CallableFunction;
-    private dblclickCb: CallableFunction;
+    private eventMgr: Event;
     private sshData: any;
 
     public constructor(title: string, container: HTMLElement) {
         this.title = title;
         this.container = container;
+        this.eventMgr = new Event();
         this.navElem = null;
         this.titleElem = null;
         this.stateElem = null;
         this.closeElem = null;
-        this.clickCb = null;
-        this.closeCb = null;
-        this.dblclickCb = null;
         this.sshData = null;
     }
 
@@ -46,19 +44,23 @@ export default class Nav {
 
         this.navElem.onclick = (event) => {
             event.stopPropagation();
-            this.clickCb(this);
+            this.eventMgr.emit("click", [this]);
         };
 
-        this.navElem.ondblclick = () => {
+        this.navElem.ondblclick = (event) => {
             event.stopPropagation();
-            this.dblclickCb(this.sshData);
+            this.eventMgr.emit("dbclick", [this]);
         };
 
         this.closeElem.onclick = () => {
-            this.closeCb();
+            this.eventMgr.emit("close", [this]);
         };
 
         this.container.append(this.navElem);
+    }
+
+    public on(eventName: string, cb: CallableFunction) {
+        this.eventMgr.add(eventName, cb);
     }
 
     public destory() {
@@ -69,20 +71,12 @@ export default class Nav {
         this.stateElem.src = icon;
     }
 
-    public setClickCb(cb: CallableFunction) {
-        this.clickCb = cb;
-    }
-
-    public setCloseCb(cb: CallableFunction) {
-        this.closeCb = cb;
-    }
-
-    public setOndblclickCb(cb: CallableFunction) {
-        this.dblclickCb = cb;
-    }
-
     public setData(data: any) {
         this.sshData = data;
+    }
+
+    public getData() {
+        return this.sshData;
     }
 
     public focus() {

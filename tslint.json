@@ -6,6 +6,7 @@
         "no-var-requires": false,
         "object-literal-key-quotes": false,
         "trailing-comma": false,
-        "forin": false
+        "forin": false,
+        "no-empty": false
     }
 }

@@ -1,21 +1,20 @@
-import { Connector, ConnectorTypeEnum } from "./classes/connector";
-import { TerminalState } from "./classes/defines";
-import CTerminal from "./classes/terminal/terminal";
-import { TerminalType } from "./classes/terminalManager";
-import { SgProto } from "./lib/sgProto";
+import { Connector, ConnectorTypeEnum } from "@/connector";
+import { SgProto } from "@/lib/sgProto";
 import {
-    configModel,
+    elementParent,
     eventMgr,
-    linkModel,
     PROTOCOL,
-    sessionModel,
     termContainer,
-    terminalMgr
-} from "./preload";
-import { confirmWarning, error } from "./util/helper";
+    terminalMgr,
+    viewMgr
+} from "@/preload";
+import { DialogType } from "@/view/base/DialogType";
+import { TerminalState } from "@/view/defines";
+import CTerminal from "@/view/terminal/terminal";
+import { TerminalType } from "@/view/terminalManager";
 
 const fs = require("fs");
-const framework = require("./classes/framework");
+const framework = require("./view/framework");
 const path = require("path");
 const baseDir = path.dirname(process.execPath);
 const userDir = baseDir + "/user";
@@ -23,18 +22,10 @@ const sessionFile = userDir + "/session";
 const backendName = "/backend/webSocketServer.exe";
 const sgProto = new SgProto("./proto/sgshell.proto");
 let connector: Connector = null;
+let gSessions: any[] = [];
 
-function isDialogOpening() {
-    const masks = document.getElementsByClassName("mask");
-    const len = masks.length;
-    let mask;
-    for (let i = 0; i < len; ++i) {
-        mask = masks[i] as HTMLElement;
-        if (mask.style.display !== "none") {
-            return true;
-        }
-    }
-    return false;
+function tipError(data: any) {
+    viewMgr.show("tip", elementParent, DialogType.ERR, data);
 }
 
 function closeCurrentDialog() {
@@ -42,28 +33,7 @@ function closeCurrentDialog() {
         return;
     }
 
-    const masks = document.getElementsByClassName("mask");
-    const len = masks.length;
-    let maxZIndex = 0;
-    let matchMask = null;
-    for (let i = 0; i < len; ++i) {
-        if (i === 3) {
-            continue;
-        }
-        const mask = masks[i] as HTMLElement;
-        if (mask.style.display === "none") {
-            continue;
-        }
-        const zIndex = parseInt(mask.style.zIndex, 10);
-        if (zIndex > maxZIndex) {
-            maxZIndex = zIndex;
-            matchMask = mask;
-        }
-    }
-    if (!matchMask) {
-        return;
-    }
-    matchMask.style.display = "none";
+    viewMgr.closeCurrent();
 }
 
 function copyText() {
@@ -91,8 +61,7 @@ function pasteText() {
 }
 
 function writeUserData() {
-    const sessions = sessionModel.getSessions();
-    const buffer = sgProto.encode("sessions", { list: sessions });
+    const buffer = sgProto.encode("sessions", { list: gSessions });
     if (!fs.existsSync(userDir)) {
         fs.mkdirSync(userDir);
     }
@@ -102,15 +71,15 @@ function writeUserData() {
 function initUserData() {
     fs.readFile(sessionFile, (err: Error, data: any) => {
         if (err) {
-            sessionModel.setSessions([]);
+            gSessions = [];
             return;
         }
         if (!data) {
-            sessionModel.setSessions([]);
+            gSessions = [];
             return;
         }
-        const [protoIdx, sessions] = sgProto.decode(data);
-        sessionModel.setSessions(sessions.list);
+        const [protoIdx, session] = sgProto.decode(data);
+        gSessions = session.list;
     });
 }
 
@@ -187,7 +156,22 @@ function newLink() {
     if (!connector.isReady()) {
         return;
     }
-    linkModel.openDialog();
+    viewMgr.show("link", elementParent, DialogType.OTHER, {
+        error: tipError,
+        confirm: confirmLink
+    });
+}
+
+function confirmLink(data: any) {
+    createTerminal(
+        data.host,
+        data.port,
+        data.user,
+        data.passwd,
+        data.type,
+        data.key,
+        data.name || data.host
+    );
 }
 
 function closeCurrentTerminal() {
@@ -200,11 +184,39 @@ function closeCurrentTerminal() {
         terminalMgr.destory(termId);
         return;
     }
-    confirmWarning("提示", "该会话还未结束，是否关闭？", () => {
-        logout(termId);
-        terminalMgr.destory(termId);
-        return true;
+    viewMgr.show("confirm", elementParent, DialogType.WARN, {
+        title: "提示",
+        message: "该会话还未结束，是否关闭？",
+        confirm: () => {
+            logout(termId);
+            terminalMgr.destory(termId);
+            return true;
+        }
     });
+}
+
+function openConfigDialog(data: any) {
+    data = data || {};
+    const idx = gSessions.indexOf(data);
+    data.idx = idx;
+    data.confirm = addSession;
+    viewMgr.show("config", elementParent, DialogType.OTHER, data);
+}
+
+function addSession(data: any) {
+    if (data.idx >= 0) {
+        gSessions[data.idx] = data;
+    } else {
+        const idx = gSessions.push(data) - 1;
+        data.idx = idx;
+    }
+    viewMgr.show("session", elementParent, DialogType.OTHER, {list: gSessions});
+}
+
+function delSession(data: any) {
+    const idx = gSessions.indexOf(data);
+    gSessions.splice(idx, 1);
+    viewMgr.show("session", elementParent, DialogType.OTHER, {list: gSessions});
 }
 
 initNet();
@@ -227,58 +239,18 @@ terminalMgr.setOnClickClose((termId: number) => {
         terminalMgr.destory(termId);
         return;
     }
-    confirmWarning("提示", "该会话还未结束，是否关闭？", () => {
-        logout(termId);
-        terminalMgr.destory(termId);
-        return true;
+    viewMgr.show("confirm", elementParent, DialogType.WARN, {
+        title: "提示",
+        message: "该会话还未结束，是否关闭？",
+        confirm: () => {
+            logout(termId);
+            terminalMgr.destory(termId);
+            return true;
+        }
     });
 });
 terminalMgr.setOndblclickCb((data: any) => {
-    createTerminal(
-        data.host,
-        data.port,
-        data.user,
-        data.passwd,
-        data.type,
-        data.key,
-        data.name
-    );
-});
-
-linkModel.setConfirmCb(() => {
-    linkModel.closeDialog();
-    createTerminal(
-        linkModel.host,
-        linkModel.port,
-        linkModel.username,
-        linkModel.password,
-        linkModel.loginType,
-        linkModel.key
-    );
-});
-
-sessionModel.setConfigModel(configModel);
-sessionModel.setConfirmFun((data: any) => {
-    createTerminal(
-        data.host,
-        data.port,
-        data.user,
-        data.passwd,
-        data.type,
-        data.key,
-        data.name
-    );
-});
-sessionModel.setDbClickFun((data: any) => {
-    createTerminal(
-        data.host,
-        data.port,
-        data.user,
-        data.passwd,
-        data.type,
-        data.key,
-        data.name
-    );
+    confirmLink(data);
 });
 
 eventMgr.add("file/new", () => {
@@ -288,7 +260,14 @@ eventMgr.add("file/close", () => {
     closeCurrentTerminal();
 });
 eventMgr.add("file/open", () => {
-    sessionModel.openDialog();
+    viewMgr.show("session", elementParent, DialogType.OTHER, {
+        confirm: confirmLink,
+        add: openConfigDialog,
+        config: openConfigDialog,
+        del: delSession,
+        error: tipError,
+        list: gSessions
+    });
 });
 eventMgr.add("resize", () => {
     const size = terminalMgr.onResize();
@@ -306,7 +285,7 @@ eventMgr.add("contextmenu/paste", () => {
     pasteText();
 });
 eventMgr.add("app/esc", () => {
-    if (isDialogOpening()) {
+    if (viewMgr.isDialogOpen()) {
         closeCurrentDialog();
         return;
     }
@@ -321,7 +300,10 @@ eventMgr.add("app/esc", () => {
 });
 eventMgr.add(PROTOCOL.loginResponse, (data: any) => {
     if (data.code === -1) {
-        error("连接错误", data.msg);
+        tipError({
+            title: "错误",
+            message: "连接错误"
+        });
         terminalMgr.destory(data.termId);
         return;
     }

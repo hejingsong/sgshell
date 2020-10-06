@@ -1,5 +1,5 @@
-import { TerminalState } from "../defines";
-import Nav from "../nav";
+import Nav from "@/view/component/Nav";
+import { TerminalState } from "@/view/defines";
 
 abstract class CTerminal {
     protected termId: number;
