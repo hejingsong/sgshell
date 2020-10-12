@@ -49,7 +49,7 @@ export default class Nav {
 
         this.navElem.ondblclick = (event) => {
             event.stopPropagation();
-            this.eventMgr.emit("dbclick", [this]);
+            this.eventMgr.emit("dbclick", this.sshData);
         };
 
         this.closeElem.onclick = () => {
